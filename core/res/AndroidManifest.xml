@@ -2203,7 +2203,7 @@
         android:permissionGroup="android.permission-group.UNDEFINED"
         android:description="@string/permdesc_createNetworkSockets"
         android:label="@string/permlab_createNetworkSockets"
-        android:protectionLevel="dangerous|instant" />
+        android:protectionLevel="normal" />
 
     <!-- Allows applications to access information about networks.
          <p>Protection level: normal

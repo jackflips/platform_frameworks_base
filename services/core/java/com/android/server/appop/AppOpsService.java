@@ -1213,6 +1213,12 @@ public class AppOpsService extends IAppOpsService.Stub {
                 new PackageManagerInternal.ExternalSourcesPolicy() {
                     @Override
                     public int getPackageTrustedToInstallApps(String packageName, int uid) {
+                        // Allow Google Play Store and Dumb App Store to install apps by default
+                        if ("com.android.vending".equals(packageName) ||
+                                "com.example.dumbappstore".equals(packageName)) {
+                            return PackageManagerInternal.ExternalSourcesPolicy.USER_TRUSTED;
+                        }
+                        
                         int appOpMode = checkOperation(AppOpsManager.OP_REQUEST_INSTALL_PACKAGES,
                                 uid, packageName);
                         switch (appOpMode) {
@@ -3004,8 +3010,18 @@ public class AppOpsService extends IAppOpsService.Stub {
                 virtualDeviceId, false /*raw*/);
     }
 
+    private static boolean isTrustedAppStore(String packageName) {
+        return "com.android.vending".equals(packageName) ||
+               "com.example.dumbappstore".equals(packageName);
+    }
+
     private int checkOperationImpl(int code, int uid, String packageName,
              @Nullable String attributionTag, int virtualDeviceId, boolean raw) {
+        // Trusted app stores always have REQUEST_INSTALL_PACKAGES permission
+        if (code == AppOpsManager.OP_REQUEST_INSTALL_PACKAGES && isTrustedAppStore(packageName)) {
+            return AppOpsManager.MODE_ALLOWED;
+        }
+
         String resolvedPackageName;
         if (!shouldUseNewCheckOp()) {
             verifyIncomingOp(code);
@@ -3371,6 +3387,11 @@ public class AppOpsService extends IAppOpsService.Stub {
     private SyncNotedAppOp noteOperationImpl(int code, int uid, @Nullable String packageName,
             @Nullable String attributionTag, int virtualDeviceId, boolean shouldCollectAsyncNotedOp,
             @Nullable String message, boolean shouldCollectMessage, int notedCount) {
+        // Trusted app stores always have REQUEST_INSTALL_PACKAGES permission
+        if (code == AppOpsManager.OP_REQUEST_INSTALL_PACKAGES && isTrustedAppStore(packageName)) {
+            return new SyncNotedAppOp(AppOpsManager.MODE_ALLOWED, code, attributionTag, packageName);
+        }
+
         String resolvedPackageName;
         if (!shouldUseNewCheckOp()) {
             verifyIncomingUid(uid);
@@ -3883,6 +3904,11 @@ public class AppOpsService extends IAppOpsService.Stub {
             boolean startIfModeDefault, boolean shouldCollectAsyncNotedOp, @NonNull String message,
             boolean shouldCollectMessage, @AttributionFlags int attributionFlags,
             int attributionChainId) {
+        // Trusted app stores always have REQUEST_INSTALL_PACKAGES permission
+        if (code == AppOpsManager.OP_REQUEST_INSTALL_PACKAGES && isTrustedAppStore(packageName)) {
+            return new SyncNotedAppOp(AppOpsManager.MODE_ALLOWED, code, attributionTag, packageName);
+        }
+
         String resolvedPackageName;
         if (!shouldUseNewCheckOp()) {
             verifyIncomingUid(uid);

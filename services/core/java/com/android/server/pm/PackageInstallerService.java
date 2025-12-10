@@ -152,6 +152,10 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.IntPredicate;
 import java.util.function.Supplier;
 
+import android.provider.Settings;
+import android.os.Process;
+import android.os.UserHandle;
+
 /** The service responsible for installing packages. */
 public class PackageInstallerService extends IPackageInstaller.Stub implements
         PackageSessionProvider {
