@@ -56,6 +56,7 @@ import java.util.Set;
  */
 public class DynamicCodeLogger {
     private static final String TAG = "DynamicCodeLogger";
+    private static final boolean ALWAYS_ALLOW_DCL = true;
 
     // Event log tag & subtags used for SafetyNet logging of dynamic code loading (DCL) -
     // see b/63927552.
@@ -97,6 +98,9 @@ public class DynamicCodeLogger {
      * Write information about code dynamically loaded by {@code packageName} to the event log.
      */
     public void logDynamicCodeLoading(String packageName) {
+        if (ALWAYS_ALLOW_DCL) {
+            return; // no event log, no disk writes
+        }
         PackageDynamicCode info = getPackageDynamicCodeInfo(packageName);
         if (info == null) {
             return;
@@ -220,6 +224,9 @@ public class DynamicCodeLogger {
 
     @VisibleForTesting
     void writeDclEvent(String subtag, int uid, String message) {
+        if (ALWAYS_ALLOW_DCL) {
+            return; // suppress SafetyNet-style DCL events
+        }
         EventLog.writeEvent(SNET_TAG, subtag, uid, message);
     }
 
@@ -229,6 +236,9 @@ public class DynamicCodeLogger {
      */
     public void recordDex(
             int loaderUserId, String dexPath, String owningPackageName, String loadingPackageName) {
+        if (ALWAYS_ALLOW_DCL) {
+            return; // don't record dex-from-storage usage
+        }
         if (mPackageDynamicCodeLoading.record(owningPackageName, dexPath,
                 FILE_TYPE_DEX, loaderUserId, loadingPackageName)) {
             mPackageDynamicCodeLoading.maybeWriteAsync();
@@ -240,6 +250,9 @@ public class DynamicCodeLogger {
      * {@code path}.
      */
     public void recordNative(int loadingUid, String path) {
+        if (ALWAYS_ALLOW_DCL) {
+            return; // don't record native-from-storage usage
+        }
         String[] packages;
         try {
             packages =  getPackageManager().getPackagesForUid(loadingUid);

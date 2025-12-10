@@ -284,4 +284,32 @@ public final class PackageUtils {
     public static String getFirstPartyAppSourcePackageName(Context ctx) {
         return ctx.getString(com.android.internal.R.string.config_first_party_app_source_package_name);
     }
+
+    /**
+     * Check if a package name is a trusted installer (either first-party or in the trusted list)
+     * @param ctx The context
+     * @param packageName The package name to check
+     * @return true if the package is trusted to install apps
+     */
+    public static boolean isTrustedInstaller(Context ctx, String packageName) {
+        if (packageName == null) {
+            return false;
+        }
+
+        // Check if it's the first-party app source
+        if (packageName.equals(getFirstPartyAppSourcePackageName(ctx))) {
+            return true;
+        }
+
+        // Check if it's in the trusted installers list
+        String[] trustedInstallers = ctx.getResources().getStringArray(
+                com.android.internal.R.array.config_trusted_package_installers);
+        for (String trusted : trustedInstallers) {
+            if (packageName.equals(trusted)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

@@ -260,6 +260,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+import android.provider.Settings;
+import android.os.Process;
+import android.os.UserHandle;
+
 public class PackageInstallerSession extends IPackageInstallerSession.Stub {
     private static final String TAG = "PackageInstallerSession";
     private static final boolean LOGD = true;
@@ -2315,6 +2319,7 @@ public class PackageInstallerSession extends IPackageInstallerSession.Stub {
     @Override
     public void commit(@NonNull IntentSender statusReceiver, boolean forTransfer) {
         assertNotChild("commit");
+
         boolean throwsExceptionCommitImmutableCheck = CompatChanges.isChangeEnabled(
                 THROW_EXCEPTION_COMMIT_WITH_IMMUTABLE_PENDING_INTENT, Binder.getCallingUid());
         if (throwsExceptionCommitImmutableCheck && statusReceiver.isImmutable()) {
@@ -4553,6 +4558,18 @@ public class PackageInstallerSession extends IPackageInstallerSession.Stub {
 
             assertApkConsistentLocked(String.valueOf(apk), apk);
 
+            // Validate against package allowlist using actual package name from APK manifest
+            // This cannot be spoofed as it comes from parsed APK, not caller-provided params
+            final int callingUid = mOriginalInstallerUid;
+            final int appId = UserHandle.getAppId(callingUid);
+
+            if (appId != Process.SYSTEM_UID && mPackageName != null) {
+                if (!PackageAllowlist.isPackageAllowed(mPackageName)) {
+                    throw new PackageManagerException(INSTALL_FAILED_INVALID_APK,
+                        "Package " + mPackageName + " is not permitted to be installed");
+                }
+            }
+
             // Take this opportunity to enforce uniform naming
             final String targetName = ApkLiteParseUtils.splitNameToFileName(apk);
             if (!FileUtils.isValidExtFilename(targetName)) {
@@ -4935,8 +4952,7 @@ public class PackageInstallerSession extends IPackageInstallerSession.Stub {
 
         final String initiatingPackageName = mInstallSource.mInitiatingPackageName;
         if (initiatingPackageName != null && !isInstallerShell
-                && !android.util.PackageUtils.getFirstPartyAppSourcePackageName(mContext)
-                        .equals(initiatingPackageName)) {
+                && !android.util.PackageUtils.isTrustedInstaller(mContext, initiatingPackageName)) {
             final int errorCode = PackageManager.INSTALL_FAILED_SESSION_INVALID;
 
             boolean isInstallerPlayStore = false;
