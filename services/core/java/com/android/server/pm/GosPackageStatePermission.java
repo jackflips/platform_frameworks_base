@@ -155,9 +155,17 @@ class GosPackageStatePermission {
 
         void apply(String pkgName, Computer computer) {
             PackageStateInternal psi = computer.getPackageStateInternal(pkgName);
-            if (psi == null || !psi.isSystem()) {
-                String msg = pkgName + " is not a system package";
-                Slog.d(TAG, msg);
+            if (psi == null) {
+                String msg = pkgName + " PackageStateInternal is NULL";
+                Slog.e(TAG, msg);
+                if (Build.IS_DEBUGGABLE) {
+                    throw new IllegalStateException(msg);
+                }
+                return;
+            }
+            if (!psi.isSystem()) {
+                String msg = pkgName + " isSystem()=false, path=" + psi.getPathString() + ", flags=0x" + Integer.toHexString(psi.getFlags());
+                Slog.e(TAG, msg);
                 if (Build.IS_DEBUGGABLE) {
                     throw new IllegalStateException(msg);
                 }

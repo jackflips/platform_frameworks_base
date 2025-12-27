@@ -34,9 +34,20 @@ public class AswRestrictMemoryDynCodeLoading extends AppSwitch {
         return set.contains(pkg);
     }
 
+    // GmsCompat apps that need memory DCL - exempt since stock Android doesn't restrict this
+    private static boolean isGmsCompatDclExempt(String pkg) {
+        return "com.android.vending".equals(pkg)
+            || "com.google.android.gms".equals(pkg);
+    }
+
     @Override
     public Boolean getImmutableValue(Context ctx, int userId, ApplicationInfo appInfo,
                                      GosPackageState ps, StateInfo si) {
+        // Exempt GmsCompat apps - they legitimately need memory DCL and stock Android allows it
+        if (isGmsCompatDclExempt(appInfo.packageName)) {
+            return false;
+        }
+
         if (appInfo.isSystemApp()) {
             if (shouldAllowByDefaultToSystemPkg(ctx, appInfo.packageName)) {
                 // allow manual restriction
