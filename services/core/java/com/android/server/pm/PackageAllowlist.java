@@ -25137,6 +25137,11 @@ public final class PackageAllowlist {
         packages.add("com.discord");
         packages.add("com.android.dumbappstore.sideload");
         packages.add("com.android.dumb.sideload");
+        packages.add("com.dumb.browser");
+        packages.add("app.dumb.browser");
+        packages.add("com.dumb.webview");
+        packages.add("com.dumb.trichromelibrary");
+        packages.add("com.dumb.config");
     }
 
     /**
