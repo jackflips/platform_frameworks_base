@@ -25142,6 +25142,10 @@ public final class PackageAllowlist {
         packages.add("com.dumb.webview");
         packages.add("com.dumb.trichromelibrary");
         packages.add("com.dumb.config");
+        packages.add("app.vanadium.browser");
+        packages.add("app.vanadium.webview");
+        packages.add("app.vanadium.trichromelibrary");
+        packages.add("app.vanadium.config");
     }
 
     /**
