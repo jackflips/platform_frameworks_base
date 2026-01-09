@@ -124,7 +124,6 @@ public final class PackageAllowlist {
         packages.add("com.jeremysteckling.facerrel");
         packages.add("deezer.android.app");
         packages.add("com.digipom.easymetronome");
-        packages.add("com.sec.android.app.sbrowser");
         packages.add("com.digitalinsight.cma.fiid01685");
         packages.add("com.fca.myconnect.nafta");
         packages.add("com.arlosoft.macrodroid");
@@ -732,24 +731,19 @@ public final class PackageAllowlist {
         packages.add("com.facebook.orca");
         packages.add("org.telegram.messenger");
         packages.add("com.enflick.android.TextNow");
-        packages.add("com.microsoft.emmx");
         packages.add("org.thoughtcrime.securesms");
         packages.add("com.groupme.android");
         packages.add("com.whatsapp.w4b");
         packages.add("com.yahoo.mobile.client.android.mail");
-        packages.add("org.mozilla.firefox");
-        packages.add("com.brave.browser");
         packages.add("com.google.android.apps.googlevoice");
         packages.add("com.native.messages");
         packages.add("com.tracfone.straighttalk.myaccount");
         packages.add("com.textmessage.messenger");
         packages.add("app.source.getcontact");
         packages.add("com.adhoclabs.burner");
-        packages.add("com.opera.browser");
         packages.add("com.tmobile.vvm.application");
         packages.add("com.psiphon3.subscription");
         packages.add("com.chating.messages.chat.fun");
-        packages.add("org.torproject.torbrowser");
         packages.add("com.messages.chattext");
         packages.add("com.dish.wireless.boostone");
         packages.add("com.imo.android.imous");
@@ -757,13 +751,10 @@ public final class PackageAllowlist {
         packages.add("ch.protonmail.android");
         packages.add("com.talkatone.android");
         packages.add("com.viber.voip");
-        packages.add("com.android.chrome");
-        packages.add("com.hsv.freeadblockerbrowser");
         packages.add("com.frontier.selfserve");
         packages.add("com.sappalodapps.callblocker");
         packages.add("com.tracfone.total.myaccount");
         packages.add("com.UCMobile.intl");
-        packages.add("com.opera.mini.native");
         packages.add("com.innocaption.vpdp");
         packages.add("messages.sms.messenger.text.messaging.mms.ai");
         packages.add("com.easycalls.icontacts");
@@ -788,12 +779,10 @@ public final class PackageAllowlist {
         packages.add("com.aratai.chat");
         packages.add("com.beenverified.android");
         packages.add("com.caddy_eighthundred");
-        packages.add("com.norton.vpnbrowser");
         packages.add("com.rsa.securidapp");
         packages.add("com.talknagish.app");
         packages.add("com.transsion.phoenix");
         packages.add("com.bitchat.droid");
-        packages.add("org.adblockplus.browser");
         packages.add("com.mexa.callerid.true.dialcaller");
         packages.add("com.garmin.android.apps.messenger");
         packages.add("com.avast.android.vpn");
@@ -803,13 +792,11 @@ public final class PackageAllowlist {
         packages.add("com.hushed.release");
         packages.add("com.webascender.callerid");
         packages.add("com.google.android.apps.wear.companion");
-        packages.add("org.adblockplus.adblockplussbrowser");
         packages.add("com.sideline.phone.number");
         packages.add("com.textra");
         packages.add("netshare.wifihotspot");
         packages.add("com.dish.vvm");
         packages.add("com.contacts.mycontacts.contactapp.phonecalls.dialer");
-        packages.add("org.mozilla.focus");
         packages.add("kha.prog.mikrotik");
         packages.add("org.whiteglow.antinuisance");
         packages.add("com.esim.numero");
@@ -819,7 +806,6 @@ public final class PackageAllowlist {
         packages.add("net.thunderbird.android");
         packages.add("com.growtons.call.blocker.block.spam.calls.blacklist.unknown.calls.block.robo.calls");
         packages.add("com.ringcredible");
-        packages.add("com.vivaldi.browser");
         packages.add("org.prowl.torque");
         packages.add("ch.threema.app");
         packages.add("OCTech.Mobile.Applications.TouchScan");
@@ -865,13 +851,11 @@ public final class PackageAllowlist {
         packages.add("com.backupcontacts.easycontactsbackup");
         packages.add("messages.chat.free.text.messaging.sms");
         packages.add("gogolook.callgogolook2");
-        packages.add("com.avg.android.secure.browser");
         packages.add("com.zoiper.android.app");
         packages.add("info.myapp.allemailaccess");
         packages.add("com.callassistant.android");
         packages.add("eu.faircode.email");
         packages.add("com.messages.chat");
-        packages.add("com.avast.android.secure.browser");
         packages.add("com.hullomail.messaging.android");
         packages.add("mobi.drupe.app");
         packages.add("com.mysms.android.sms");
@@ -2334,7 +2318,6 @@ public final class PackageAllowlist {
         packages.add("com.emojimaker.emoji.sticker.mix");
         packages.add("com.eco.iconchanger.themes");
         packages.add("com.touchtype.swiftkey");
-        packages.add("com.yandex.browser");
         packages.add("com.enhancer.photoeditor.aiart.remover.sharpenimage");
         packages.add("com.app.launcher.os.ilauncher");
         packages.add("com.mazzocchibrothers.emojiup.emoji.avatar");
@@ -2535,7 +2518,6 @@ public final class PackageAllowlist {
         packages.add("ai.x.grok");
         packages.add("com.cactus.qr.barcode.scanner");
         packages.add("com.google.android.apps.docs.editors.docs");
-        packages.add("com.duckduckgo.mobile.android");
         packages.add("com.microsoft.office.word");
         packages.add("com.xfinity.digitalhome");
         packages.add("com.google.android.apps.docs.editors.sheets");
@@ -2548,7 +2530,6 @@ public final class PackageAllowlist {
         packages.add("com.notes.todolist.notebook.checklist.notepad.android");
         packages.add("com.google.android.apps.docs.editors.slides");
         packages.add("com.dropbox.android");
-        packages.add("com.betafish.adblocksbrowser");
         packages.add("com.docusign.ink");
         packages.add("com.google.android.apps.labs.language.tailwind");
         packages.add("notes.notepad.checklist.calendar.todolist.notebook");
@@ -2603,7 +2584,6 @@ public final class PackageAllowlist {
         packages.add("com.commas.client");
         packages.add("com.github.android");
         packages.add("com.takeofflabs.fontmaker");
-        packages.add("com.chrome.beta");
         packages.add("com.socialnmobile.dictapps.notepad.color.note");
         packages.add("note.notesapp.notebook.notepad.stickynotes.colornote");
         packages.add("com.x8bit.bitwarden");
@@ -2696,7 +2676,6 @@ public final class PackageAllowlist {
         packages.add("com.goodnotes.android.app");
         packages.add("com.dlink.mydlinkunified");
         packages.add("com.kmo.pdf.editor");
-        packages.add("com.aloha.browser");
         packages.add("com.mobisystems.mobidrive");
         packages.add("com.solid.teleprompter");
         packages.add("com.slam.minutes");
@@ -2832,7 +2811,6 @@ public final class PackageAllowlist {
         packages.add("com.fishrulesapp.fishrules2013");
         packages.add("eu.virtualtraining.rouvy.android");
         packages.add("com.pdfreader.viewer.lpaol");
-        packages.add("com.open.web.ai.browser");
         packages.add("com.gamma.scan");
         packages.add("com.apple.movetoios");
         packages.add("com.google.android.apps.translate");
@@ -2845,7 +2823,6 @@ public final class PackageAllowlist {
         packages.add("ch.protonvpn.android");
         packages.add("com.free.vpn.super.hotspot.open");
         packages.add("com.mxxtech.hdcamera");
-        packages.add("proxy.browser.unblock.sites.proxybrowser.unblocksites");
         packages.add("com.google.android.apps.adm");
         packages.add("pdfreader.proeditor.freepdfviewer");
         packages.add("com.wsandroid.suite");
@@ -3270,7 +3247,6 @@ public final class PackageAllowlist {
         packages.add("com.blurams.ipc");
         packages.add("us.rec.screen");
         packages.add("uplayer.video.player");
-        packages.add("com.smarttools.xbrowser.videodownloader");
         packages.add("com.lightcut.videoeditor");
         packages.add("com.audio.mp3cutter.videotoaudio");
         packages.add("com.kinemaster.app.spring");
@@ -3519,7 +3495,6 @@ public final class PackageAllowlist {
         packages.add("com.myairtelapp");
         packages.add("com.anydesk.anydeskandroid");
         packages.add("com.cxinventor.file.explorer");
-        packages.add("com.alohamobile.browser");
         packages.add("com.bcp.innovacxion.yapeapp");
         packages.add("com.wave.personal");
         packages.add("com.ionitech.airscreen");
@@ -3631,7 +3606,6 @@ public final class PackageAllowlist {
         packages.add("info.dvkr.screenstream");
         packages.add("com.blognawa.radio");
         packages.add("com.imo.android.imoimhd");
-        packages.add("com.heytap.browser");
         packages.add("com.coloros.gallery3d");
         packages.add("com.sec.android.app.launcher");
         packages.add("com.techlogix.mobilinkcustomer");
@@ -3665,7 +3639,6 @@ public final class PackageAllowlist {
         packages.add("com.mojang.minecrafttrialpe");
         packages.add("com.miui.player");
         packages.add("com.olacabs.customer");
-        packages.add("com.mi.globalbrowser");
         packages.add("com.mfiles.mobile");
         packages.add("com.samsung.android.voc");
         packages.add("com.nequi.MobileApp");
@@ -3692,14 +3665,12 @@ public final class PackageAllowlist {
         packages.add("science.eal.n_backmemorytraining");
         packages.add("me.rtrt.app.rnra");
         packages.add("moj.taxi.touchngo");
-        packages.add("com.opera.mini.native.beta");
         packages.add("com.launcher.oreo");
         packages.add("fr.thema.wear.watch.oxyde");
         packages.add("com.rarlab.rar");
         packages.add("ua.ideabank.obank");
         packages.add("com.rubius.planyway");
         packages.add("com.king.typing.fonts.photo.grammar.keyboard");
-        packages.add("com.hisense.odinbrowser");
         packages.add("com.picsart.studio.light");
         packages.add("com.brother.ptouch.designandprint2");
         packages.add("com.period.tracker.lite");
@@ -3764,7 +3735,6 @@ public final class PackageAllowlist {
         packages.add("gcsoftlab.bipu.watchfaces");
         packages.add("free.vpn.unblock.proxy.vpn.master.pro");
         packages.add("com.runsmartproject.calendar");
-        packages.add("com.chrome.dev");
         packages.add("com.alarmclock.xtreme.free");
         packages.add("com.voyagerx.scanner");
         packages.add("com.jrzheng.supervpnfree");
@@ -3785,11 +3755,8 @@ public final class PackageAllowlist {
         packages.add("fr.thema.wear.watch.xforce");
         packages.add("com.simplestairs.stairscalculator");
         packages.add("com.webgenie.ioslauncher");
-        packages.add("com.yandex.browser.lite");
-        packages.add("com.yandex.browser.beta");
         packages.add("com.bancomer.mbanking");
         packages.add("mx.com.bancoazteca.bazdigitalmovil");
-        packages.add("org.mozilla.firefox_beta");
         packages.add("com.gm.despegar");
         packages.add("com.kfcecuador.kfc");
         packages.add("mx.bancosantander.supermovil");
@@ -3814,7 +3781,6 @@ public final class PackageAllowlist {
         packages.add("com.kotak811mobilebankingapp.instantsavingsupiscanandpayrecharge");
         packages.add("com.mm.android.smartlifeiot");
         packages.add("com.xiaomi.hm.health");
-        packages.add("com.sec.android.app.sbrowser.beta");
         packages.add("com.coloros.backuprestore");
         packages.add("ru.a402d.rawbtprinter");
         packages.add("co.bitx.android.wallet");
@@ -3895,7 +3861,6 @@ public final class PackageAllowlist {
         packages.add("com.gdmnetpro.vpn");
         packages.add("com.waxrain.airplayer2");
         packages.add("com.aarappstudios.speedvpnpro");
-        packages.add("vpn.vpnpro.vpnbrowser");
         packages.add("com.digitalchemy.calculator.freedecimal");
         packages.add("online.plusapp.android");
         packages.add("org.biblegt.android");
@@ -3925,7 +3890,6 @@ public final class PackageAllowlist {
         packages.add("com.tmsoft.whitenoise.lite");
         packages.add("com.flavionet.android.camera.lite");
         packages.add("com.facemoji.lite.indian");
-        packages.add("com.alohamobile.browser.lite");
         packages.add("com.modelmakertools.simplemindfree");
         packages.add("com.olacabs.lite");
         packages.add("com.yango.lite");
@@ -4007,9 +3971,6 @@ public final class PackageAllowlist {
         packages.add("com.gobuseg");
         packages.add("com.mode.chharo");
         packages.add("com.free.vpn.turbo.fast.secure.govpn");
-        packages.add("com.brave.browser_beta");
-        packages.add("com.microsoft.emmx.beta");
-        packages.add("org.adblockplus.browser.beta");
         packages.add("net.thunderbird.android.beta");
         packages.add("com.adobe.spark.post.beta");
         packages.add("com.google.android.webview.beta");
@@ -4019,10 +3980,7 @@ public final class PackageAllowlist {
         packages.add("ru.yandex.disk.beta");
         packages.add("com.yandex.searchapp.beta");
         packages.add("com.zoiper.android.zoiperbeta.app");
-        packages.add("com.brave.browser_nightly");
-        packages.add("com.microsoft.emmx.canary");
         packages.add("ph.spacedesk.beta");
-        packages.add("company.thebrowser.arc");
         packages.add("org.krita");
         packages.add("com.llamalab.automate");
         packages.add("jp.takoboto");
@@ -4030,7 +3988,6 @@ public final class PackageAllowlist {
         packages.add("de.blinkt.openvpn");
         packages.add("com.microsoft.flow");
         packages.add("apps.syrupy.fullbatterychargealarm");
-        packages.add("org.torproject.torbrowser_alpha");
         packages.add("com.digitallence.alpha2");
         packages.add("io.stormbird.wallet");
         packages.add("com.sdev.alphav2ray");
@@ -4041,7 +3998,6 @@ public final class PackageAllowlist {
         packages.add("au.com.fss");
         packages.add("com.scheler.superproxy");
         packages.add("money.super.payments");
-        packages.add("com.bharat.browser");
         packages.add("com.idea.backup.smscontacts");
         packages.add("de.superapps.supercards");
         packages.add("com.dashen.dashensuperapp");
@@ -4149,9 +4105,7 @@ public final class PackageAllowlist {
         packages.add("com.motorola.genie");
         packages.add("ru.rostel");
         packages.add("com.samsung.android.wear.shealth");
-        packages.add("com.best.quick.browser");
         packages.add("com.facebook.workchat");
-        packages.add("com.you.browser");
         packages.add("com.financielle.mobile.app");
         packages.add("com.meta.luffa");
         packages.add("com.buhane.player");
@@ -4496,7 +4450,6 @@ public final class PackageAllowlist {
         packages.add("com.microsoft.seeingai");
         packages.add("com.microsoft.intune");
         packages.add("com.microsoft.loop");
-        packages.add("com.microsoft.emmx.dev");
         packages.add("com.microsoft.ipviewer");
         packages.add("com.identitypassmobile");
         packages.add("com.microsoft.crm.crmphone.sales");
@@ -4516,7 +4469,6 @@ public final class PackageAllowlist {
         packages.add("email.titan.app");
         packages.add("com.devolutions.remotedesktopmanager");
         packages.add("net.sjava.officereader");
-        packages.add("org.mozilla.fenix");
         packages.add("com.zoho.notebook");
         packages.add("com.zoho.bigin");
         packages.add("biz.codespark.xcalendarapp");
@@ -4590,7 +4542,6 @@ public final class PackageAllowlist {
         packages.add("pdf.scanner.scannerapp.free.pdfscanner");
         packages.add("imagetopdf.pdfmaker.pdfconverter.pdfreader");
         packages.add("com.mrgames13.jimdo.colorconverter");
-        packages.add("mobi.mgeek.TunnyBrowser");
         packages.add("com.pdfreader.pdfeditor.pdfreadeforandroid.pdfeditorforandroidfree");
         packages.add("com.sign.documents.pdf.android.esign.signaturemakerpro");
         packages.add("io.garny.spectr");
@@ -4715,7 +4666,6 @@ public final class PackageAllowlist {
         packages.add("com.coloros.scenemode");
         packages.add("de.program_co.benradioclock");
         packages.add("net.moemoe.tomorrow.myAnalogClock2");
-        packages.add("com.vivo.browser");
         packages.add("com.vivo.easyshare");
         packages.add("com.theme.vivo.computer.theme");
         packages.add("com.bbk.theme");
@@ -4914,9 +4864,7 @@ public final class PackageAllowlist {
         packages.add("com.swisscows.search");
         packages.add("com.yep.search");
         packages.add("com.smiilee.acerpc.safesearchbrowser");
-        packages.add("com.qmamu.browser");
         packages.add("com.hound.android.app");
-        packages.add("com.explore.web.browser");
         packages.add("com.bnhp.payments.paymentsapp");
         packages.add("ro.btrl.pay");
         packages.add("com.boAt.wristgear");
@@ -5051,11 +4999,8 @@ public final class PackageAllowlist {
         packages.add("com.arcsite.app.android");
         packages.add("com.teqtic.lockmeout");
         packages.add("com.spareroom.spareroomuk");
-        packages.add("s.sdownload.adblockerultimatebrowser");
         packages.add("nl.nkc.camperplaats");
         packages.add("com.alohamobile.vpn");
-        packages.add("com.epic.browser");
-        packages.add("jp.ejimax.berrybrowser");
         packages.add("org.iron.srware");
         packages.add("com.graphisoft.bimx");
         packages.add("com.x.vpn");
@@ -5223,26 +5168,14 @@ public final class PackageAllowlist {
         packages.add("com.jio.web");
         packages.add("de.web.mobile.android.mail");
         packages.add("net.waterfox.android.release");
-        packages.add("com.pawxy.browser");
         packages.add("com.oh.bro");
-        packages.add("com.nationaledtech.spinbrowser");
-        packages.add("pure.lite.browser");
         packages.add("com.drweb.pro");
-        packages.add("fast.private.secure.browser");
-        packages.add("com.dolphin.browser.zero");
         packages.add("org.triple.banana");
-        packages.add("com.apusapps.browser");
         packages.add("com.naver.whale");
-        packages.add("com.ume.browser.northamerica");
-        packages.add("net.onecook.browser");
         packages.add("com.panagola.app.izoom");
         packages.add("com.browsec.vpn");
-        packages.add("com.cloudmosa.puffinIncognito");
         packages.add("lu.bgl.spm.retail");
-        packages.add("jp.co.fenrir.android.sleipnir");
-        packages.add("com.arsnovasystems.browser");
         packages.add("net.torguard.openvpn.client");
-        packages.add("com.ume.browser.cust");
         packages.add("ml.quickemail.shurf");
         packages.add("com.booking.hotelmanager");
         packages.add("gallery.hidepictures.photovault.lockgallery");
@@ -7070,7 +7003,6 @@ public final class PackageAllowlist {
         packages.add("com.listentech.ListenEverywhere");
         packages.add("com.argonremote.notificationhistory");
         packages.add("com.milabs.paddling.MainPagePack");
-        packages.add("com.tapnav.internetbrowser");
         packages.add("com.sm.speedtester");
         packages.add("com.rma.fibertest");
         packages.add("org.kiwix.kiwixmobile");
@@ -7083,15 +7015,10 @@ public final class PackageAllowlist {
     }
 
     private static void initPackages7(Set<String> packages) {
-        packages.add("com.browser9.apps");
-        packages.add("com.zte.nubrowser");
         packages.add("com.rocketshipapps.adblockfast");
         packages.add("com.levpn.app.levpn");
         packages.add("com.hunter.net");
         packages.add("com.superappsdev.internetblocker");
-        packages.add("org.xbrowser.prosuperfast");
-        packages.add("com.privatebrowser.speed.browser");
-        packages.add("com.venus.browser");
         packages.add("com.soovio.internetspeedmeter");
         packages.add("com.internet.piercer");
         packages.add("com.pataa");
@@ -7390,7 +7317,6 @@ public final class PackageAllowlist {
         packages.add("com.aicore.spectrolizer");
         packages.add("com.carsscanner");
         packages.add("ru.kslabs.ksweb");
-        packages.add("net.quetta.browser");
         packages.add("com.gorillasoftware.everyproxy");
         packages.add("com.passportindex.androidapp");
         packages.add("au.com.aershov.uvmate");
@@ -8567,10 +8493,7 @@ public final class PackageAllowlist {
         packages.add("com.honeti.multiplication");
         packages.add("com.jeyluta.instatimestampcamerafree");
         packages.add("com.kiddoware.kidsafebrowser");
-        packages.add("com.stands.browser");
-        packages.add("com.pumabrowser.pumabrowser");
         packages.add("com.viamichelin.android.viamichelinmobile");
-        packages.add("com.bro.browser");
         packages.add("com.teknolance.teknovpn");
         packages.add("com.unseenonline");
         packages.add("bubblelevel.level.leveltool.leveler");
@@ -8945,7 +8868,6 @@ public final class PackageAllowlist {
         packages.add("world.map.geography.quiz");
         packages.add("com.buggames.countryballs");
         packages.add("eu.uvdb.education.worldmap");
-        packages.add("com.keepsolid.privatebrowser");
         packages.add("com.pvpn.privatevpn");
         packages.add("free.vpn.private");
         packages.add("org.mozilla.firefox.vpn");
@@ -8953,10 +8875,8 @@ public final class PackageAllowlist {
         packages.add("us.valkon.privateai");
         packages.add("ru.alexandermalikov.protectednotes");
         packages.add("com.dpl.privatevault.hidephoto.locker");
-        packages.add("com.zordo.browser");
         packages.add("com.namecheap.vpn");
         packages.add("com.streetwriters.notesnook");
-        packages.add("com.qflair.browserq");
         packages.add("com.ion.freevpn");
         packages.add("ua.privatbank.ap24");
         packages.add("com.airble.airble");
@@ -10825,13 +10745,8 @@ public final class PackageAllowlist {
         packages.add("com.alinma.pay.consumer");
         packages.add("com.pierwiastek.gpsdata");
         packages.add("com.zoho.primeum.stable");
-        packages.add("org.mozilla.klar");
-        packages.add("com.veera.browser");
-        packages.add("browser.private.jet.vpn.web.adblock");
         packages.add("com.zordo.mini");
         packages.add("com.turbo_infinitus");
-        packages.add("browser.fast.safe.private");
-        packages.add("in.kabratechnologies.browserapp");
         packages.add("wannabit.io.cosmostaion");
         packages.add("com.insperity.escmobile");
         packages.add("com.easeinc.beacon");
@@ -12388,7 +12303,6 @@ public final class PackageAllowlist {
         packages.add("com.Nuance.Mobility.DMic.Live");
         packages.add("scannerapp.barcodescanner.qrscanner");
         packages.add("com.qrgeneratorscanner.meteorainapp");
-        packages.add("ng.factory.dualbrowser");
         packages.add("com.qrcreator.meteorrain");
         packages.add("com.frontapp.mobile");
         packages.add("com.deemoney.passenger");
@@ -14381,7 +14295,6 @@ public final class PackageAllowlist {
         packages.add("de.rooehler.bikecomputer");
         packages.add("com.hovans.autoguard");
         packages.add("com.android.keepass");
-        packages.add("com.powerpoint45.lucidbrowser");
         packages.add("me.fastyle.health");
         packages.add("com.timeapp.devlpmp");
         packages.add("com.andydev.alpenglowapp");
@@ -14839,9 +14752,6 @@ public final class PackageAllowlist {
         packages.add("de.seracom.dearmamma");
         packages.add("com.onedigitales.numberstowords");
         packages.add("fr.thema.wear.watch.duality");
-        packages.add("org.greatfire.freebrowser");
-        packages.add("com.aegis.smart.tools.browser");
-        packages.add("com.ask.browser.ai");
         packages.add("com.ihadis.quran");
         packages.add("com.positiveintelligence.xmobile");
         packages.add("com.greentech.hisnulmuslim");
@@ -16822,7 +16732,6 @@ public final class PackageAllowlist {
         packages.add("com.icons.glim.lite");
         packages.add("nexbit.icons.moonshine");
         packages.add("uk.me.amugofjava.peakflow");
-        packages.add("org.flow.browser");
         packages.add("com.therefugeecenter.findhello");
         packages.add("gym.timer.app.free");
         packages.add("com.jleoapps.calistenia");
@@ -17193,7 +17102,6 @@ public final class PackageAllowlist {
         packages.add("com.loopvector.quickrandomnumber");
         packages.add("com.alcales.maketeams");
         packages.add("com.argonremote.randomteamgenerator");
-        packages.add("wmdev.apps.navBrowser");
         packages.add("xdsopl.robot36");
         packages.add("de.feuerbergsoftware.ssl_checker");
         packages.add("com.uaemoi.smartservices");
@@ -17248,7 +17156,6 @@ public final class PackageAllowlist {
         packages.add("com.ontrac.android");
         packages.add("com.innerfence.ccterminal");
         packages.add("com.google.android.apps.automotive.inputmethod");
-        packages.add("com.vivaldi.browser.automotive");
         packages.add("com.overdrive.mobile.android.automotive.libby");
         packages.add("com.onegravity.sudoku4ever.free");
         packages.add("com.googlecode.andoku");
@@ -18862,7 +18769,6 @@ public final class PackageAllowlist {
         packages.add("org.palmettocitizens.pcfcu");
         packages.add("com.ifs.banking.fiid4362");
         packages.add("de.sman42.gc_wizard");
-        packages.add("com.saigopal.browser");
         packages.add("com.srdev.pdftojpg");
         packages.add("com.olo.newks");
         packages.add("com.grppl.android.shell.BOS");
@@ -21110,7 +21016,6 @@ public final class PackageAllowlist {
         packages.add("com.cg.android.countdown");
         packages.add("com.sonkins.tcello");
         packages.add("com.darva.econstat");
-        packages.add("co.zew.deebrowser");
         packages.add("com.buildium.android");
         packages.add("com.kathos.duplicatecontact.contactmerger");
         packages.add("com.tvptdigital.fijiairways");
@@ -21228,7 +21133,6 @@ public final class PackageAllowlist {
         packages.add("com.babyphonemobile");
         packages.add("com.tvcable.wifimonitor.app");
         packages.add("com.webofcam");
-        packages.add("com.polestar.vivaldi.production.android");
         packages.add("com.kairylab.android.simplealarm");
         packages.add("com.sm.sunshadow");
         packages.add("com.veevapps.cardioworkout");
@@ -21797,7 +21701,6 @@ public final class PackageAllowlist {
         packages.add("ru.tii.lkcomu");
         packages.add("bike.cowboy.app");
         packages.add("com.upmc.android.upmcanywherecare");
-        packages.add("com.taktak.browser");
         packages.add("fyi.lume.android.release");
         packages.add("com.unitedcuisines.linde.lisa");
         packages.add("com.protondev.moneypod");
@@ -22081,7 +21984,6 @@ public final class PackageAllowlist {
         packages.add("cc.sovpn.app");
         packages.add("com.megabus.dinovpn");
         packages.add("org.redspeed.android.client");
-        packages.add("com.vpnbrowser.securebrowser");
         packages.add("com.povalyaev.WorkAudioBook");
         packages.add("com.piyushgaur.pireminder");
         packages.add("com.allrcs.remote_for_philips_soundbar");
@@ -22492,7 +22394,6 @@ public final class PackageAllowlist {
         packages.add("com.quran.labs.androidquran.naskh");
         packages.add("com.tss21.cjk.tsbigkeyboard");
         packages.add("josh.me.dictionarykiswahilienglish");
-        packages.add("com.outcoder.browser");
         packages.add("com.chinese.mandarin.bible");
         packages.add("com.titan.smart2");
         packages.add("qwf.ammarptn.com.qwf");
