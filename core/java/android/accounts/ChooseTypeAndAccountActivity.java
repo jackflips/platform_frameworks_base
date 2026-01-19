@@ -232,6 +232,7 @@ public class ChooseTypeAndAccountActivity extends Activity
                 } else {
                     startChooseAccountTypeActivity();
                 }
+                return;
             }
         }
 

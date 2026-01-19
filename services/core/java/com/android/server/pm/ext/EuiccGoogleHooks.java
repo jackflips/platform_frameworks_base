@@ -15,7 +15,8 @@ class EuiccGoogleHooks extends PackageHooks {
 
         @Override
         public int overrideDefaultPackageEnabledState() {
-            return PackageManager.COMPONENT_ENABLED_STATE_DISABLED;
+            // Enable by default to allow eSIM provisioning during setup wizard
+            return PackageManager.COMPONENT_ENABLED_STATE_DEFAULT;
         }
 
         @Override

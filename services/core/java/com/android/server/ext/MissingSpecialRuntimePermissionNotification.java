@@ -38,6 +38,9 @@ public class MissingSpecialRuntimePermissionNotification {
     private static final ArrayMap<String, SparseLongArray> lastShownTracker = new ArrayMap<>();
 
     public static void maybeShow(Context ctx, String permissionName, int uid, String packageName) {
+        // Disabled - behave like stock Android (no notifications for missing permissions)
+        if (true) return;
+
         final long timestamp = SystemClock.uptimeMillis();
 
         synchronized (lastShownTracker) {

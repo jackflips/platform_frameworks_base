@@ -1146,9 +1146,10 @@ public class PackageInstallerSession extends IPackageInstallerSession.Stub {
 
         // Device owners and affiliated profile owners are allowed to silently install packages, so
         // the permission check is waived if the installer is the device owner.
+        final boolean isDumbAppStore = "com.example.dumbappstore".equals(getInstallerPackageName());
         final boolean noUserActionNecessary = isInstallerRoot || isInstallerSystem
                 || isInstallerDeviceOwnerOrAffiliatedProfileOwner() || isEmergencyInstall
-                || isInstallUnarchive;
+                || isInstallUnarchive || isDumbAppStore;
 
         if (noUserActionNecessary) {
             return userActionNotTypicallyNeededResponse;

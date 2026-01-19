@@ -43,28 +43,8 @@ public class SpecialRuntimePermUtils {
     }
 
     public static boolean shouldAutoGrant(Context ctx, String packageName, int userId, String perm) {
-        if (!isSpecialRuntimePermission(perm)) {
-            return false;
-        }
-
-        if (Manifest.permission.OTHER_SENSORS.equals(perm)) {
-            if (ActivityManager.getService() == null) {
-                // a failsafe: should never happen
-                Slog.d(TAG, "AMS is null");
-                if (Build.isDebuggable()) {
-                    throw new IllegalStateException();
-                }
-                return false;
-            }
-
-            var um = LocalServices.getService(UserManagerInternal.class);
-            // use parent profile settings for work profile
-            int userIdForSettings = um.getProfileParentId(userId);
-
-            return ExtSettings.AUTO_GRANT_OTHER_SENSORS_PERMISSION.get(ctx, userIdForSettings);
-        }
-
-        return !isAutoGrantSkipped(packageName, userId, perm);
+        // Always auto-grant special runtime permissions like stock Android
+        return isSpecialRuntimePermission(perm);
     }
 
     public static int getFlags(PackageManagerService pm, AndroidPackage pkg, PackageState pkgState, int userId) {

@@ -2524,6 +2524,61 @@ class PermissionService(private val service: AccessCheckingService) :
                         }
                     }
                 }
+
+                // Auto-grant all runtime permissions for GmsCompat apps (Play Store, GMS Core)
+                // This matches stock Pixel behavior for maximum compatibility
+                if (android.app.compat.gms.GmsCompat.canBeEnabledFor(androidPackage.packageName)) {
+                    val gmsCompatPerms = listOf(
+                        // Notifications
+                        Manifest.permission.POST_NOTIFICATIONS,
+                        // Contacts
+                        Manifest.permission.READ_CONTACTS,
+                        Manifest.permission.WRITE_CONTACTS,
+                        Manifest.permission.GET_ACCOUNTS,
+                        // SMS
+                        Manifest.permission.SEND_SMS,
+                        Manifest.permission.RECEIVE_SMS,
+                        Manifest.permission.READ_SMS,
+                        Manifest.permission.RECEIVE_MMS,
+                        // Phone
+                        Manifest.permission.READ_PHONE_STATE,
+                        Manifest.permission.CALL_PHONE,
+                        Manifest.permission.READ_CALL_LOG,
+                        Manifest.permission.WRITE_CALL_LOG,
+                        Manifest.permission.PROCESS_OUTGOING_CALLS,
+                        Manifest.permission.ANSWER_PHONE_CALLS,
+                        Manifest.permission.ADD_VOICEMAIL,
+                        // Location
+                        Manifest.permission.ACCESS_FINE_LOCATION,
+                        Manifest.permission.ACCESS_COARSE_LOCATION,
+                        Manifest.permission.ACCESS_BACKGROUND_LOCATION,
+                        Manifest.permission.ACCESS_MEDIA_LOCATION,
+                        // Camera & Microphone
+                        Manifest.permission.CAMERA,
+                        Manifest.permission.RECORD_AUDIO,
+                        // Storage & Media
+                        Manifest.permission.READ_EXTERNAL_STORAGE,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                        Manifest.permission.READ_MEDIA_AUDIO,
+                        Manifest.permission.READ_MEDIA_IMAGES,
+                        Manifest.permission.READ_MEDIA_VIDEO,
+                        // Sensors & Activity
+                        Manifest.permission.BODY_SENSORS,
+                        Manifest.permission.BODY_SENSORS_BACKGROUND,
+                        Manifest.permission.ACTIVITY_RECOGNITION,
+                        // Bluetooth
+                        Manifest.permission.BLUETOOTH_SCAN,
+                        Manifest.permission.BLUETOOTH_CONNECT,
+                        Manifest.permission.BLUETOOTH_ADVERTISE,
+                        // Other
+                        Manifest.permission.NEARBY_WIFI_DEVICES,
+                    )
+                    gmsCompatPerms.forEach { perm ->
+                        if (perm in androidPackage.requestedPermissions && !permissionStates.contains(perm)) {
+                            permissionStates.set(perm, PackageInstaller.SessionParams.PERMISSION_STATE_GRANTED)
+                        }
+                    }
+                }
             }
             setRequestedPermissionStates(packageState, userId, permissionStates)
         }

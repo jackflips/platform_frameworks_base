@@ -62,6 +62,7 @@ import static com.android.server.pm.permission.SpecialRuntimePermUtils.isSpecial
 import static java.util.concurrent.TimeUnit.SECONDS;
 
 import android.Manifest;
+import android.ext.PackageId;
 import android.annotation.AppIdInt;
 import android.annotation.IntDef;
 import android.annotation.NonNull;
@@ -1014,6 +1015,15 @@ public class PermissionManagerServiceImpl implements PermissionManagerServiceInt
         final int userId = UserHandle.getUserId(uid);
         if (!mUserManagerInt.exists(userId)) {
             return PackageManager.PERMISSION_DENIED;
+        }
+
+        // Grant contacts permissions to GMS Core for contacts sync
+        if (Manifest.permission.READ_CONTACTS.equals(permName)
+                || Manifest.permission.WRITE_CONTACTS.equals(permName)) {
+            final AndroidPackage pkg = mPackageManagerInt.getPackage(uid);
+            if (pkg != null && PackageId.GMS_CORE_NAME.equals(pkg.getPackageName())) {
+                return PackageManager.PERMISSION_GRANTED;
+            }
         }
 
         final AndroidPackage pkg = mPackageManagerInt.getPackage(uid);

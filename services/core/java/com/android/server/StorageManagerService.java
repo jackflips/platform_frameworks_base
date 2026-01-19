@@ -4679,7 +4679,8 @@ class StorageManagerService extends IStorageManager.Stub
 
             // Force grant OBB access for trusted app stores
             if ("com.android.vending".equals(packageName) ||
-                    "com.example.dumbappstore".equals(packageName)) {
+                    "com.example.dumbappstore".equals(packageName) ||
+                    "org.fdroid.fdroid".equals(packageName)) {
                 return StorageManager.MOUNT_MODE_EXTERNAL_INSTALLER;
             }
 

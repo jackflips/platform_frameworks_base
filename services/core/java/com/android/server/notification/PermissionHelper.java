@@ -23,6 +23,7 @@ import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 
 import android.Manifest;
 import android.annotation.NonNull;
+import android.app.compat.gms.GmsCompat;
 import android.annotation.UserIdInt;
 import android.companion.virtual.VirtualDeviceManager;
 import android.content.Context;
@@ -71,6 +72,19 @@ public final class PermissionHelper {
     public boolean hasPermission(int uid) {
         final long callingId = Binder.clearCallingIdentity();
         try {
+            // Allow notifications for GmsCompat apps (Play Store, GMS Core, etc.)
+            try {
+                String[] pkgs = mPackageManager.getPackagesForUid(uid);
+                if (pkgs != null) {
+                    for (String pkg : pkgs) {
+                        if (GmsCompat.canBeEnabledFor(pkg)) {
+                            return true;
+                        }
+                    }
+                }
+            } catch (RemoteException e) {
+                // Fall through to normal permission check
+            }
             return mContext.checkPermission(NOTIFICATION_PERMISSION, -1, uid) == PERMISSION_GRANTED;
         } finally {
             Binder.restoreCallingIdentity(callingId);

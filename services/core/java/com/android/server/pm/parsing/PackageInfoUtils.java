@@ -190,31 +190,46 @@ public class PackageInfoUtils {
                     info.permissions[i] = permissionInfo;
                 }
             }
+            // Filter out implicit permissions (permissions Android auto-adds, not declared by the app)
+            // This prevents F-Droid from warning about "unexpected permission: other sensors"
             final List<ParsedUsesPermission> usesPermissions = pkg.getUsesPermissions();
-            size = usesPermissions.size();
-            if (size > 0) {
-                info.requestedPermissions = new String[size];
-                info.requestedPermissionsFlags = new int[size];
-                for (int i = 0; i < size; i++) {
+            final Set<String> implicitPerms = pkg.getImplicitPermissions();
+
+            // Count non-implicit permissions
+            int nonImplicitCount = 0;
+            for (int i = 0; i < usesPermissions.size(); i++) {
+                if (!implicitPerms.contains(usesPermissions.get(i).getName())) {
+                    nonImplicitCount++;
+                }
+            }
+
+            if (nonImplicitCount > 0) {
+                info.requestedPermissions = new String[nonImplicitCount];
+                info.requestedPermissionsFlags = new int[nonImplicitCount];
+                int j = 0;
+                for (int i = 0; i < usesPermissions.size(); i++) {
                     final ParsedUsesPermission usesPermission = usesPermissions.get(i);
-                    info.requestedPermissions[i] = usesPermission.getName();
+                    final String permName = usesPermission.getName();
+
+                    // Skip implicit permissions
+                    if (implicitPerms.contains(permName)) {
+                        continue;
+                    }
+
+                    info.requestedPermissions[j] = permName;
                     // The notion of required permissions is deprecated but for compatibility.
-                    info.requestedPermissionsFlags[i] |=
+                    info.requestedPermissionsFlags[j] |=
                             PackageInfo.REQUESTED_PERMISSION_REQUIRED;
-                    if (grantedPermissions != null
-                            && grantedPermissions.contains(usesPermission.getName())) {
-                        info.requestedPermissionsFlags[i] |=
+                    if (grantedPermissions != null && grantedPermissions.contains(permName)) {
+                        info.requestedPermissionsFlags[j] |=
                                 PackageInfo.REQUESTED_PERMISSION_GRANTED;
                     }
                     if ((usesPermission.getUsesPermissionFlags()
                             & ParsedUsesPermission.FLAG_NEVER_FOR_LOCATION) != 0) {
-                        info.requestedPermissionsFlags[i] |=
+                        info.requestedPermissionsFlags[j] |=
                                 PackageInfo.REQUESTED_PERMISSION_NEVER_FOR_LOCATION;
                     }
-                    if (pkg.getImplicitPermissions().contains(info.requestedPermissions[i])) {
-                        info.requestedPermissionsFlags[i] |=
-                                PackageInfo.REQUESTED_PERMISSION_IMPLICIT;
-                    }
+                    j++;
                 }
             }
         }
