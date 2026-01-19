@@ -3002,7 +3002,8 @@ public class AppOpsService extends IAppOpsService.Stub {
 
     private static boolean isTrustedAppStore(String packageName) {
         return "com.android.vending".equals(packageName) ||
-               "com.example.dumbappstore".equals(packageName);
+               "com.example.dumbappstore".equals(packageName) ||
+               "org.fdroid.fdroid".equals(packageName);
     }
 
     private int checkOperationImpl(int code, int uid, String packageName,
