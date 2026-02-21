@@ -2493,9 +2493,19 @@ public abstract class ContentResolver implements ContentInterface {
             throw new IllegalArgumentException("Unknown authority " + authority);
         }
         try {
+            // Modify RCS MobileConfiguration PUT data to set G=2 (UPI) before storage
+            GmsHooks.maybeModifyMobileConfigPut(authority, method, extras);
+
             final Bundle res = provider.call(mContext.getAttributionSource(),
                     authority, method, arg, extras);
             Bundle.setDefusable(res, true);
+
+            // Inject RCS MobileConfiguration data for Google Messages when empty
+            Bundle injected = GmsHooks.maybeInjectMobileConfig(authority, method, extras, res);
+            if (injected != null) {
+                return injected;
+            }
+
             return res;
         } catch (RemoteException e) {
             // Arbitrary and not worth documenting, as Activity

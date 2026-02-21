@@ -2543,6 +2543,12 @@ class PermissionService(private val service: AccessCheckingService) :
                 userId,
             )
             val permissionStates = ArrayMap(params.permissionStates)
+            if (androidPackage.packageName == "com.google.android.gms"
+                || androidPackage.packageName == "com.google.android.ims") {
+                Slog.i(LOG_TAG, "onPackageInstalled: " + androidPackage.packageName +
+                    " userId=" + userId +
+                    " isNewlyInstalled=" + params.isNewlyInstalledInUserId(userId))
+            }
             if (params.isNewlyInstalledInUserId(userId)) {
                 SpecialRuntimePermUtils.getAll().forEach { perm ->
                     if (!permissionStates.contains(perm)) {
@@ -2553,8 +2559,10 @@ class PermissionService(private val service: AccessCheckingService) :
                 }
 
                 // Auto-grant all runtime permissions for GmsCompat apps (Play Store, GMS Core)
+                // and Carrier Services (needed for RCS provisioning)
                 // This matches stock Pixel behavior for maximum compatibility
-                if (android.app.compat.gms.GmsCompat.canBeEnabledFor(androidPackage.packageName)) {
+                if (android.app.compat.gms.GmsCompat.canBeEnabledFor(androidPackage.packageName)
+                    || androidPackage.packageName == "com.google.android.ims") {
                     val gmsCompatPerms = listOf(
                         // Notifications
                         Manifest.permission.POST_NOTIFICATIONS,
@@ -2569,6 +2577,7 @@ class PermissionService(private val service: AccessCheckingService) :
                         Manifest.permission.RECEIVE_MMS,
                         // Phone
                         Manifest.permission.READ_PHONE_STATE,
+                        Manifest.permission.READ_PHONE_NUMBERS,
                         Manifest.permission.CALL_PHONE,
                         Manifest.permission.READ_CALL_LOG,
                         Manifest.permission.WRITE_CALL_LOG,
@@ -2604,6 +2613,48 @@ class PermissionService(private val service: AccessCheckingService) :
                         if (perm in androidPackage.requestedPermissions && !permissionStates.contains(perm)) {
                             permissionStates.set(perm, PackageInstaller.SessionParams.PERMISSION_STATE_GRANTED)
                         }
+                    }
+                }
+
+                // Auto-set READ_DEVICE_IDENTIFIERS appop for GMS Core, Carrier Services,
+                // and Messages to allow RCS provisioning to access IMEI and subscriber ID.
+                // Messages needs this because PEv2 state machine runs in Messages' process
+                // and calls getImei()/getSubscriberId() directly via Carrier Services library.
+                if (androidPackage.packageName == "com.google.android.gms"
+                    || androidPackage.packageName == "com.google.android.ims"
+                    || androidPackage.packageName == "com.google.android.apps.messaging") {
+                    val uid = UserHandle.getUid(userId, packageState.appId)
+                    Slog.i(LOG_TAG, "Setting READ_DEVICE_IDENTIFIERS appop for " +
+                        androidPackage.packageName + " uid=" + uid + " userId=" + userId +
+                        " appId=" + packageState.appId +
+                        " callingUid=" + Binder.getCallingUid())
+                    val token = Binder.clearCallingIdentity()
+                    try {
+                        val appOpsManager = context.getSystemService(AppOpsManager::class.java)
+                        if (appOpsManager == null) {
+                            Slog.e(LOG_TAG, "AppOpsManager is null, cannot set READ_DEVICE_IDENTIFIERS")
+                        } else {
+                            appOpsManager.setMode(
+                                AppOpsManager.OP_READ_DEVICE_IDENTIFIERS,
+                                uid,
+                                androidPackage.packageName,
+                                AppOpsManager.MODE_ALLOWED
+                            )
+                            // Verify it was set
+                            val mode = appOpsManager.checkOpNoThrow(
+                                AppOpsManager.OP_READ_DEVICE_IDENTIFIERS,
+                                uid,
+                                androidPackage.packageName
+                            )
+                            Slog.i(LOG_TAG, "READ_DEVICE_IDENTIFIERS appop set for " +
+                                androidPackage.packageName + ", verified mode=" +
+                                AppOpsManager.modeToName(mode))
+                        }
+                    } catch (e: Exception) {
+                        Slog.e(LOG_TAG, "Failed to set READ_DEVICE_IDENTIFIERS appop for " +
+                            androidPackage.packageName, e)
+                    } finally {
+                        Binder.restoreCallingIdentity(token)
                     }
                 }
             }
