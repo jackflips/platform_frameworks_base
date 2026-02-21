@@ -27,6 +27,7 @@ import android.annotation.SuppressLint;
 import android.annotation.SystemApi;
 import android.annotation.TestApi;
 import android.app.ActivityThread;
+import android.app.AppOpsManager;
 import android.app.Application;
 import android.app.compat.gms.GmsCompat;
 import android.compat.annotation.UnsupportedAppUsage;
@@ -272,6 +273,20 @@ public class Build {
             boolean shouldHook =
                     !GmsCompat.hasPermission(Manifest.permission.READ_PRIVILEGED_PHONE_STATE)
                     && !GmsCompat.hasPermission(Manifest.permission.READ_DEVICE_SERIAL_NUMBER);
+
+            // Allow real serial if app has READ_DEVICE_IDENTIFIERS appop (needed for RCS)
+            if (shouldHook) {
+                Application app = ActivityThread.currentApplication();
+                if (app != null) {
+                    AppOpsManager appOps = app.getSystemService(AppOpsManager.class);
+                    if (appOps != null && appOps.checkOpNoThrow(
+                            AppOpsManager.OP_READ_DEVICE_IDENTIFIERS,
+                            Process.myUid(),
+                            app.getPackageName()) == AppOpsManager.MODE_ALLOWED) {
+                        shouldHook = false;
+                    }
+                }
+            }
 
             if (shouldHook) {
                 return GmsHooks.getSerial();

@@ -62,6 +62,10 @@ import com.android.internal.gmscompat.gcarriersettings.GCarrierSettingsApp;
 import com.android.internal.gmscompat.gcarriersettings.TestCarrierConfigService;
 import com.android.internal.gmscompat.sysservice.GmcPackageManager;
 
+import android.util.Base64;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -86,6 +90,8 @@ public final class GmsHooks {
     }
 
     public static void init(Context ctx, String packageName, String processName) {
+        Log.e(TAG, "GmsHooks.init() called: pkg=" + packageName + " process=" + processName
+                + " isGmsCore=" + GmsCompat.isGmsCore());
         if (!packageName.equals(processName)) {
             // Fix RuntimeException: Using WebView from more than one process at once with the same data
             // directory is not supported. https://crbug.com/558377
@@ -112,15 +118,28 @@ public final class GmsHooks {
         // Locking is needed to prevent a race that would occur if config is updated via
         // BinderGca2Gms#updateConfig in the time window between BinderGms2Gca#connect and setConfig()
         // call below. Older GmsCompatConfig would overwrite the newer one in that case.
+        Log.e(TAG, "About to call GmsCompatApp.connect()");
         synchronized (configUpdateLock) {
             GmsCompatConfig config = GmsCompatApp.connect(ctx, processName);
+            Log.e(TAG, "GmsCompatApp.connect() returned, config=" + (config != null ? "non-null" : "NULL"));
             setConfig(config);
         }
 
         Thread.setUncaughtExceptionPreHandler(new UncaughtExceptionPreHandler());
 
+        Log.e(TAG, "inPersistentGmsCoreProcess=" + inPersistentGmsCoreProcess
+                + " PERSISTENT_PROCESS=" + PERSISTENT_GmsCore_PROCESS
+                + " processName=" + processName);
         if (inPersistentGmsCoreProcess) {
-            GmsFlagOverrides.init(ctx);
+            Log.e(TAG, "About to call GmsFlagOverrides.init()");
+            try {
+                GmsFlagOverrides.init(ctx);
+                Log.e(TAG, "GmsFlagOverrides.init() completed successfully");
+            } catch (Throwable t) {
+                Log.e(TAG, "GmsFlagOverrides.init() CRASHED", t);
+            }
+        } else {
+            Log.e(TAG, "NOT persistent process, skipping GmsFlagOverrides");
         }
 
         GmcPackageManager.init(ctx);
@@ -349,12 +368,14 @@ public final class GmsHooks {
             }
 
             String namespace = path.get(0);
+            Log.e(TAG, "Phenotype query: namespace=" + namespace);
 
             GmsCompatConfig config = config();
 
             ArrayList<String> forceDefaultFlagsRegexes = config.forceDefaultFlagsMap.get(namespace);
+            ArrayMap<String, GmsFlag> namespaceFlags = config.flags.get(namespace);
 
-            if (forceDefaultFlagsRegexes == null) {
+            if (forceDefaultFlagsRegexes == null && namespaceFlags == null) {
                 return null;
             }
 
@@ -380,6 +401,13 @@ public final class GmsHooks {
                     map.clear();
                     map.putAll(filteredMap);
                 }
+
+                // Apply flag overrides from config directly into the query result
+                if (namespaceFlags != null) {
+                    for (GmsFlag flag : namespaceFlags.values()) {
+                        flag.applyToPhenotypeMap(map);
+                    }
+                }
             };
         }
 
@@ -404,8 +432,15 @@ public final class GmsHooks {
                 && "key".equals(projection[keyIndex]) && "value".equals(projection[valueIndex]);
 
         if (!expectedProjection) {
-            Log.e(TAG, "unexpected projection " + Arrays.toString(projection), new Throwable());
-            return null;
+            if (origCursor == null) {
+                // Original query failed (e.g. Phenotype namespace authorization error).
+                // Use default projection so we can still provide our flag overrides.
+                Log.d(TAG, "using default [key, value] projection for null cursor");
+                projection = new String[]{"key", "value"};
+            } else {
+                Log.e(TAG, "unexpected projection " + Arrays.toString(projection), new Throwable());
+                return null;
+            }
         }
 
         final ArrayMap<String, String> map;
@@ -690,6 +725,233 @@ public final class GmsHooks {
         }
 
         return GmcBinderDefs.maybeOverrideBinder(binder, ifaceName);
+    }
+
+    // MobileConfiguration injection for Google Messages RCS provisioning.
+    // Messages stores RCS config in its SharedStorageProvider as base64-encoded protobuf.
+    // When SIM is present, Messages ALWAYS reads from MobileConfiguration (not Phenotype).
+    // After data clear or fresh install, MobileConfiguration is empty, causing availability=2
+    // (DISABLED_VIA_GSERVICES) which prevents RCS provisioning from starting.
+    // This hook injects synthetic RCS onboarding flags (containing the ACS URL) when Messages
+    // reads an empty result, breaking the chicken-and-egg cycle.
+
+    private static final String MESSAGES_SHARED_STORAGE_AUTHORITY =
+            "com.google.android.apps.messaging.shared.datamodel.provider.sharedstorage.SharedStorageProvider";
+    private static final String MOBILE_CONFIG_STORAGE_FILE = "bugle_mobile_configuration";
+    private static final String RCS_ONBOARDING_FLAGS_SUFFIX = ".CONFIGURATION_TYPE_RCS_ONBOARDING_FLAGS";
+    // AT&T Jibe ACS URL
+    private static final String RCS_ACS_URL = "http://rcs-acs-att-us.jibe.google.com";
+
+    /**
+     * Intercept PUT operations to Messages' SharedStorageProvider for RCS onboarding flags.
+     * When the MobileConfiguration sync stores server data, modify the protobuf to change
+     * field 24 (G = provisioning method) from 0 to 2 (UPI) BEFORE it's stored.
+     * This ensures the clpu cache gets populated with G=2 regardless of code path.
+     */
+    public static void maybeModifyMobileConfigPut(
+            String authority, String method, @Nullable Bundle extras) {
+        if (!"PUT".equals(method) || !MESSAGES_SHARED_STORAGE_AUTHORITY.equals(authority)) {
+            return;
+        }
+        if (extras == null) {
+            return;
+        }
+        String storageFile = extras.getString("storage_file_name");
+        if (!MOBILE_CONFIG_STORAGE_FILE.equals(storageFile)) {
+            return;
+        }
+        String key = extras.getString("preference_key");
+        if (key == null || !key.endsWith(RCS_ONBOARDING_FLAGS_SUFFIX)) {
+            return;
+        }
+        String value = extras.getString("preference_value");
+        if (value == null || value.isEmpty()) {
+            return;
+        }
+
+        try {
+            byte[] data = android.util.Base64.decode(value, android.util.Base64.DEFAULT);
+            // Search for field 33 tag (0x88 0x02) followed by value 0/1 and replace with value 2.
+            // Proto field 33 = Java fffq.G (uppercase), wire type 0 (varint):
+            //   (33 << 3) | 0 = 264 = 0x108, varint-encoded as 0x88 0x02.
+            // G controls UPI path selection: G=2 → ffgj.a(2)=4 → UPI verification path.
+            // NOTE: Proto field 24 = fffq.g (lowercase), NOT G! Setting g=2 causes
+            //   fffk.a(2)=4 → DISABLED_VIA_FLAGS (availability=23). Do NOT touch field 24.
+            boolean modified = false;
+            for (int i = 0; i < data.length - 2; i++) {
+                if ((data[i] & 0xff) == 0x88 && (data[i + 1] & 0xff) == 0x02) {
+                    int val = data[i + 2] & 0xff;
+                    if (val == 0x00 || val == 0x01) {
+                        data[i + 2] = 0x02;
+                        modified = true;
+                        Log.i(TAG, "PUT hook: changed G (field 33) from " + val + " to 2 at offset " + (i + 2) + " for key: " + key);
+                        break;
+                    }
+                }
+            }
+            if (modified) {
+                String newValue = android.util.Base64.encodeToString(data, android.util.Base64.DEFAULT).trim();
+                extras.putString("preference_value", newValue);
+                Log.i(TAG, "PUT hook: modified RCS onboarding flags protobuf for storage");
+            } else {
+                Log.d(TAG, "PUT hook: no G=0 or G=1 found in protobuf, G may already be 2");
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "PUT hook: error modifying protobuf", e);
+        }
+    }
+
+    /**
+     * Check if a ContentResolver.call() result from Messages' SharedStorageProvider should have
+     * RCS onboarding flags injected. Called from ContentResolver.call() for all apps, so this
+     * method must return quickly for the common case (non-Messages callers).
+     */
+    public static @Nullable Bundle maybeInjectMobileConfig(
+            String authority, String method, @Nullable Bundle extras, @Nullable Bundle result) {
+        // Fast path: skip if not a GET to Messages' SharedStorageProvider
+        if (!"GET".equals(method) || !MESSAGES_SHARED_STORAGE_AUTHORITY.equals(authority)) {
+            return null;
+        }
+
+        if (extras == null) {
+            return null;
+        }
+
+        String storageFile = extras.getString("storage_file_name");
+        if (!MOBILE_CONFIG_STORAGE_FILE.equals(storageFile)) {
+            return null;
+        }
+
+        String key = extras.getString("preference_key");
+        if (key == null || !key.endsWith(RCS_ONBOARDING_FLAGS_SUFFIX)) {
+            return null;
+        }
+
+        // If there's existing data, patch G field in-place (preserving all carrier config).
+        // If no data exists, inject synthetic protobuf with just the ACS URL and G=2.
+        if (result != null) {
+            String value = result.getString("preference_key");
+            if (value != null && !value.isEmpty()) {
+                // Patch G field (field 33) in existing data to value 2 (UPI)
+                // Proto field 33 = fffq.G (uppercase), tag 0x88 0x02
+                try {
+                    byte[] data = android.util.Base64.decode(value, android.util.Base64.DEFAULT);
+                    boolean patched = false;
+                    for (int i = 0; i < data.length - 2; i++) {
+                        if ((data[i] & 0xff) == 0x88 && (data[i + 1] & 0xff) == 0x02) {
+                            int val = data[i + 2] & 0xff;
+                            if (val != 0x02 && val <= 0x04) {
+                                Log.i(TAG, "GET hook: patching G (field 33) from " + val + " to 2 at offset " + (i + 2));
+                                data[i + 2] = 0x02;
+                                patched = true;
+                                break;
+                            } else if (val == 0x02) {
+                                Log.d(TAG, "GET hook: G already 2, no patch needed");
+                                return null; // Data already correct, use original
+                            }
+                        }
+                    }
+                    if (patched) {
+                        String newValue = android.util.Base64.encodeToString(data, android.util.Base64.DEFAULT).trim();
+                        Bundle injected = new Bundle();
+                        injected.putString("preference_key", newValue);
+                        Log.i(TAG, "GET hook: returning patched data (" + data.length + " bytes) with G=2");
+                        return injected;
+                    }
+                    Log.d(TAG, "GET hook: no G field found in existing data, using original");
+                    return null;
+                } catch (Exception e) {
+                    Log.e(TAG, "GET hook: error patching data", e);
+                    return null;
+                }
+            }
+        }
+
+        // No existing data — inject synthetic protobuf with ACS URL and G=2
+        String b64Data = buildRcsOnboardingFlagsProtobuf(RCS_ACS_URL);
+        if (b64Data == null) {
+            Log.e(TAG, "Failed to build RCS onboarding flags protobuf");
+            return null;
+        }
+        Log.i(TAG, "GET hook: injecting synthetic protobuf (no existing data)");
+        Bundle injected = new Bundle();
+        injected.putString("preference_key", b64Data);
+        return injected;
+    }
+
+    /**
+     * Build base64-encoded protobuf for RCS onboarding flags.
+     *
+     * Proto hierarchy (from decompiled Messages):
+     *   drbo (ConfigurationData):
+     *     field 2 = ffeo (MobileConfigEntry)
+     *   ffeo (MobileConfigEntry):
+     *     field 3 = fffq (RcsOnboardingFlags) [oneof case]
+     *   fffq (RcsOnboardingFlags):
+     *     field 2 = string (direct URL, sets oneof e=2)
+     *     field 33 = int (provisioning method G uppercase, value 2 = UPI)
+     *     field 24 = int (g lowercase — DO NOT SET to 2, causes DISABLED_VIA_FLAGS!)
+     *
+     * Field 33 (G uppercase) controls the ReadyState branch in dplg.l():
+     *   G=2 → ffgj.a(2)=4 → UPI path → VerifyMsisdnState (correct)
+     *   G=0 (default) → ffgj.a(0)=2 → non-UPI → RequestWithHeState (wrong)
+     *
+     * Field 24 (g lowercase) controls availability in cqps.u():
+     *   g=2 → fffk.a(2)=4 → DISABLED_VIA_FLAGS (availability=23) — BAD!
+     *   g=0 or g=1 → OK, no disable
+     */
+    private static @Nullable String buildRcsOnboardingFlagsProtobuf(String acsUrl) {
+        try {
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+
+            // fffq: field 2 = acsUrl (wire type 2 = length-delimited)
+            byte[] urlBytes = acsUrl.getBytes("UTF-8");
+            byte[] fffq = new byte[0];
+            {
+                ByteArrayOutputStream fffqOut = new ByteArrayOutputStream();
+                writeTag(fffqOut, 2, 2);
+                writeVarint(fffqOut, urlBytes.length);
+                fffqOut.write(urlBytes);
+                // field 33 = provisioning method G uppercase (wire type 0 = varint)
+                // Value 2 → ffgj.a(2)=4 → UPI path in ReadyState
+                // NOTE: field 24 is g (lowercase), setting it to 2 causes DISABLED_VIA_FLAGS!
+                writeTag(fffqOut, 33, 0);
+                writeVarint(fffqOut, 2);
+                fffq = fffqOut.toByteArray();
+            }
+
+            // ffeo: field 3 = fffq (wire type 2 = length-delimited)
+            byte[] ffeo;
+            {
+                ByteArrayOutputStream ffeoOut = new ByteArrayOutputStream();
+                writeTag(ffeoOut, 3, 2);
+                writeVarint(ffeoOut, fffq.length);
+                ffeoOut.write(fffq);
+                ffeo = ffeoOut.toByteArray();
+            }
+
+            // drbo: field 2 = ffeo (wire type 2 = length-delimited)
+            writeTag(out, 2, 2);
+            writeVarint(out, ffeo.length);
+            out.write(ffeo);
+
+            return Base64.encodeToString(out.toByteArray(), Base64.DEFAULT).trim();
+        } catch (IOException e) {
+            Log.e(TAG, "Error building protobuf", e);
+            return null;
+        }
+    }
+
+    private static void writeVarint(ByteArrayOutputStream out, int value) {
+        while (value > 0x7f) {
+            out.write(0x80 | (value & 0x7f));
+            value >>>= 7;
+        }
+        out.write(value & 0x7f);
+    }
+
+    private static void writeTag(ByteArrayOutputStream out, int fieldNumber, int wireType) {
+        writeVarint(out, (fieldNumber << 3) | wireType);
     }
 
     private GmsHooks() {}

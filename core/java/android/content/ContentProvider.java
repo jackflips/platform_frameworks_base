@@ -33,6 +33,7 @@ import android.annotation.SystemApi;
 import android.annotation.TestApi;
 import android.app.AppOpsManager;
 import android.app.compat.gms.GmsCompat;
+import com.android.internal.gmscompat.GmsHooks;
 import android.compat.annotation.UnsupportedAppUsage;
 import android.content.pm.PackageManager;
 import android.content.pm.PathPermission;
@@ -257,6 +258,17 @@ public abstract class ContentProvider implements ContentInterface, ComponentCall
             uri = maybeGetUriWithoutUserId(uri);
             if (enforceReadPermission(attributionSource, uri)
                     != PermissionChecker.PERMISSION_GRANTED) {
+                // GmsCompat: even if the framework-level permission check fails,
+                // still apply Phenotype flag overrides so overridden flags are visible
+                // to all apps querying GMS Core's ConfigChimeraProvider.
+                if (GmsCompat.isEnabled()) {
+                    Cursor modified = GmsHooks.maybeModifyQueryResult(
+                            uri, projection, queryArgs, null);
+                    if (modified != null) {
+                        return modified;
+                    }
+                }
+
                 // The caller has no access to the data, so return an empty cursor with
                 // the columns in the requested order. The caller may ask for an invalid
                 // column and we would not catch that but this is not a problem in practice.
@@ -294,9 +306,43 @@ public abstract class ContentProvider implements ContentInterface, ComponentCall
             final AttributionSource original = setCallingAttributionSource(
                     attributionSource);
             try {
-                return mInterface.query(
-                        uri, projection, queryArgs,
-                        CancellationSignal.fromTransport(cancellationSignal));
+                Cursor result = null;
+                boolean queryFailed = false;
+                try {
+                    result = mInterface.query(
+                            uri, projection, queryArgs,
+                            CancellationSignal.fromTransport(cancellationSignal));
+                } catch (Exception e) {
+                    // If GmsCompat is enabled, catch exceptions from the ContentProvider
+                    // (e.g. SecurityException from ConfigChimeraProvider authorization
+                    // checks) so the Phenotype flag override hook can still run.
+                    if (GmsCompat.isEnabled()) {
+                        queryFailed = true;
+                        Log.d("GmsCompat", "query() threw for " + uri + ": " + e);
+                    } else {
+                        throw e;
+                    }
+                }
+
+                // Server-side hook: apply GmsCompat Phenotype flag overrides.
+                // This runs in GMS Core's process (where GmsCompat is enabled) and
+                // modifies query results before they're sent to ANY calling app,
+                // including those that don't have GmsCompat enabled (e.g. Messages).
+                if (GmsCompat.isEnabled()) {
+                    Cursor modified = GmsHooks.maybeModifyQueryResult(
+                            uri, projection, queryArgs, result);
+                    if (modified != null) {
+                        if (result != null) {
+                            result.close();
+                        }
+                        return modified;
+                    }
+                }
+
+                if (queryFailed) {
+                    return null;
+                }
+                return result;
             } catch (RemoteException e) {
                 throw e.rethrowAsRuntimeException();
             } finally {
