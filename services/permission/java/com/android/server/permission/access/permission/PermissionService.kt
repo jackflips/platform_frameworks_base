@@ -2543,12 +2543,6 @@ class PermissionService(private val service: AccessCheckingService) :
                 userId,
             )
             val permissionStates = ArrayMap(params.permissionStates)
-            if (androidPackage.packageName == "com.google.android.gms"
-                || androidPackage.packageName == "com.google.android.ims") {
-                Slog.i(LOG_TAG, "onPackageInstalled: " + androidPackage.packageName +
-                    " userId=" + userId +
-                    " isNewlyInstalled=" + params.isNewlyInstalledInUserId(userId))
-            }
             if (params.isNewlyInstalledInUserId(userId)) {
                 SpecialRuntimePermUtils.getAll().forEach { perm ->
                     if (!permissionStates.contains(perm)) {
@@ -2616,48 +2610,37 @@ class PermissionService(private val service: AccessCheckingService) :
                     }
                 }
 
-                // Auto-set READ_DEVICE_IDENTIFIERS appop for GMS Core, Carrier Services,
-                // and Messages to allow RCS provisioning to access IMEI and subscriber ID.
-                // Messages needs this because PEv2 state machine runs in Messages' process
-                // and calls getImei()/getSubscriberId() directly via Carrier Services library.
-                if (androidPackage.packageName == "com.google.android.gms"
-                    || androidPackage.packageName == "com.google.android.ims"
-                    || androidPackage.packageName == "com.google.android.apps.messaging") {
-                    val uid = UserHandle.getUid(userId, packageState.appId)
-                    Slog.i(LOG_TAG, "Setting READ_DEVICE_IDENTIFIERS appop for " +
-                        androidPackage.packageName + " uid=" + uid + " userId=" + userId +
-                        " appId=" + packageState.appId +
-                        " callingUid=" + Binder.getCallingUid())
-                    val token = Binder.clearCallingIdentity()
-                    try {
-                        val appOpsManager = context.getSystemService(AppOpsManager::class.java)
-                        if (appOpsManager == null) {
-                            Slog.e(LOG_TAG, "AppOpsManager is null, cannot set READ_DEVICE_IDENTIFIERS")
-                        } else {
-                            appOpsManager.setMode(
-                                AppOpsManager.OP_READ_DEVICE_IDENTIFIERS,
-                                uid,
-                                androidPackage.packageName,
-                                AppOpsManager.MODE_ALLOWED
-                            )
-                            // Verify it was set
-                            val mode = appOpsManager.checkOpNoThrow(
-                                AppOpsManager.OP_READ_DEVICE_IDENTIFIERS,
-                                uid,
-                                androidPackage.packageName
-                            )
-                            Slog.i(LOG_TAG, "READ_DEVICE_IDENTIFIERS appop set for " +
-                                androidPackage.packageName + ", verified mode=" +
-                                AppOpsManager.modeToName(mode))
-                        }
-                    } catch (e: Exception) {
-                        Slog.e(LOG_TAG, "Failed to set READ_DEVICE_IDENTIFIERS appop for " +
-                            androidPackage.packageName, e)
-                    } finally {
-                        Binder.restoreCallingIdentity(token)
+            }
+
+            // Auto-set READ_DEVICE_IDENTIFIERS appop for GMS Core, Carrier Services,
+            // and Messages to allow RCS provisioning to access IMEI and subscriber ID.
+            // Uses setUidMode instead of setMode because during onPackageInstalled the
+            // package may not be fully registered in AppOpsService yet, causing setMode's
+            // verifyAndGetBypass to silently fail.
+            if (androidPackage.packageName == "com.google.android.gms"
+                || androidPackage.packageName == "com.google.android.ims"
+                || androidPackage.packageName == "com.google.android.apps.messaging") {
+                val uid = UserHandle.getUid(userId, packageState.appId)
+                val token = Binder.clearCallingIdentity()
+                try {
+                    val appOpsManager = context.getSystemService(AppOpsManager::class.java)
+                    if (appOpsManager != null) {
+                        appOpsManager.setUidMode(
+                            AppOpsManager.OP_READ_DEVICE_IDENTIFIERS,
+                            uid,
+                            AppOpsManager.MODE_ALLOWED
+                        )
+                        Slog.i(LOG_TAG, "Set READ_DEVICE_IDENTIFIERS appop for " +
+                            androidPackage.packageName + " uid=" + uid)
                     }
+                } catch (e: Exception) {
+                    Slog.e(LOG_TAG, "Failed to set READ_DEVICE_IDENTIFIERS appop for " +
+                        androidPackage.packageName, e)
+                } finally {
+                    Binder.restoreCallingIdentity(token)
                 }
             }
+
             setRequestedPermissionStates(packageState, userId, permissionStates)
         }
     }
