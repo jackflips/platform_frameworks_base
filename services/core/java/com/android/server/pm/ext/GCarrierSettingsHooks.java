@@ -3,7 +3,6 @@ package com.android.server.pm.ext;
 import android.Manifest;
 
 import com.android.internal.gmscompat.gcarriersettings.TestCarrierConfigService;
-import com.android.internal.pm.pkg.component.ParsedProvider;
 import com.android.internal.pm.pkg.component.ParsedService;
 import com.android.internal.pm.pkg.component.ParsedUsesPermission;
 import com.android.internal.pm.pkg.parsing.ParsingPackage;
@@ -29,10 +28,9 @@ class GCarrierSettingsHooks extends PackageHooks {
             return Collections.singletonList(s);
         }
 
-        @Override
-        public boolean shouldSkipProvider(ParsedProvider p) {
-            return "com.google.android.carrier.vendorprovider".equals(p.getAuthority());
-        }
+        // VendorConfigProvider is no longer skipped: since we use GCarrierSettings (not
+        // CarrierConfig2), GCarrierSettings needs its own provider to avoid crashing in
+        // UpdateService.updateVendorConfigs().
     }
 
     @Override

@@ -778,13 +778,18 @@ public final class GmsHooks {
             // NOTE: Proto field 24 = fffq.g (lowercase), NOT G! Setting g=2 causes
             //   fffk.a(2)=4 → DISABLED_VIA_FLAGS (availability=23). Do NOT touch field 24.
             boolean modified = false;
+            boolean found = false;
             for (int i = 0; i < data.length - 2; i++) {
                 if ((data[i] & 0xff) == 0x88 && (data[i + 1] & 0xff) == 0x02) {
+                    found = true;
                     int val = data[i + 2] & 0xff;
                     if (val == 0x00 || val == 0x01) {
                         data[i + 2] = 0x02;
                         modified = true;
                         Log.i(TAG, "PUT hook: changed G (field 33) from " + val + " to 2 at offset " + (i + 2) + " for key: " + key);
+                        break;
+                    } else if (val == 0x02) {
+                        Log.d(TAG, "PUT hook: G already 2, no change needed");
                         break;
                     }
                 }
@@ -793,8 +798,16 @@ public final class GmsHooks {
                 String newValue = android.util.Base64.encodeToString(data, android.util.Base64.DEFAULT).trim();
                 extras.putString("preference_value", newValue);
                 Log.i(TAG, "PUT hook: modified RCS onboarding flags protobuf for storage");
-            } else {
-                Log.d(TAG, "PUT hook: no G=0 or G=1 found in protobuf, G may already be 2");
+            } else if (!found) {
+                // Field 33 not present in protobuf — append it with value 2
+                // Tag: 0x88 0x02 (field 33, wire type 0), Value: 0x02
+                byte[] appendBytes = new byte[]{(byte) 0x88, 0x02, 0x02};
+                byte[] newData = new byte[data.length + appendBytes.length];
+                System.arraycopy(data, 0, newData, 0, data.length);
+                System.arraycopy(appendBytes, 0, newData, data.length, appendBytes.length);
+                String newValue = android.util.Base64.encodeToString(newData, android.util.Base64.DEFAULT).trim();
+                extras.putString("preference_value", newValue);
+                Log.i(TAG, "PUT hook: appended G=2 (field 33) to protobuf (" + data.length + " → " + newData.length + " bytes) for key: " + key);
             }
         } catch (Exception e) {
             Log.e(TAG, "PUT hook: error modifying protobuf", e);
@@ -858,8 +871,16 @@ public final class GmsHooks {
                         Log.i(TAG, "GET hook: returning patched data (" + data.length + " bytes) with G=2");
                         return injected;
                     }
-                    Log.d(TAG, "GET hook: no G field found in existing data, using original");
-                    return null;
+                    // Field 33 not found in existing data — append G=2
+                    byte[] appendBytes = new byte[]{(byte) 0x88, 0x02, 0x02};
+                    byte[] newData = new byte[data.length + appendBytes.length];
+                    System.arraycopy(data, 0, newData, 0, data.length);
+                    System.arraycopy(appendBytes, 0, newData, data.length, appendBytes.length);
+                    String appendedValue = android.util.Base64.encodeToString(newData, android.util.Base64.DEFAULT).trim();
+                    Bundle appended = new Bundle();
+                    appended.putString("preference_key", appendedValue);
+                    Log.i(TAG, "GET hook: appended G=2 (field 33) to existing data (" + data.length + " → " + newData.length + " bytes)");
+                    return appended;
                 } catch (Exception e) {
                     Log.e(TAG, "GET hook: error patching data", e);
                     return null;
